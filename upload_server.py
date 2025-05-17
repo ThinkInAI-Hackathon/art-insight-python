@@ -5,10 +5,10 @@ from flask import Flask, request, jsonify, render_template
 from ai_agent_stream import AIAgent  # 导入 AI Agent 类
 
 # 七牛云配置（请替换为你的实际配置）
-QINIU_ACCESS_KEY = '_-5PY-C2FBhnyZxIIYX8f82w8ZGSWYeQgOto82Ho'
-QINIU_SECRET_KEY = 'vDb9HJd0dAUZaUUYP6tN8cTREOQ4MfPF-1ZtdHuL'
+QINIU_ACCESS_KEY = '_-5PY-'
+QINIU_SECRET_KEY = '-1ZtdHuL'
 QINIU_BUCKET = 'art-insight-poc1'
-QINIU_DOMAIN = 'http://swei02p5t.hd-bkt.clouddn.com'  # 如：http://xxx.bkt.clouddn.com
+QINIU_DOMAIN = 'http://.hd-bkt.clouddn.com'  # 如：http://xxx.bkt.clouddn.com
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB限制
