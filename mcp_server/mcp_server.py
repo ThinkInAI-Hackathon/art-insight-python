@@ -17,10 +17,10 @@ app.config['LLM_API_KEY'] = os.getenv('LLM_API_KEY', 'default-key')
 
 
 # 七牛云配置（请替换为你的实际配置）
-QINIU_ACCESS_KEY = '_-5PY-C2FBhnyZxIIYX8f82w8ZGSWYeQgOto82Ho'
-QINIU_SECRET_KEY = 'vDb9HJd0dAUZaUUYP6tN8cTREOQ4MfPF-1ZtdHuL'
+QINIU_ACCESS_KEY = '_-5PY-'
+QINIU_SECRET_KEY = '-1ZtdHuL'
 QINIU_BUCKET = 'art-insight-poc1'
-QINIU_DOMAIN = 'http://swei02p5t.hd-bkt.clouddn.com'  # 如：http://xxx.bkt.clouddn.com
+QINIU_DOMAIN = 'http://.hd-bkt.clouddn.com'  # 如：http://xxx.bkt.clouddn.com
 
 # 配置加载（建议使用环境变量或配置文件）
 CONFIG = {
@@ -70,7 +70,7 @@ def call_qnyun_ai(image_url):
         ]
     }
     headers = {
-        "Authorization": "Bearer sk-a01996924f84ee46c7fb19c209778896ef87f40ec8c618e4355c285bcc873adc",
+        "Authorization": "Bearer sk-",
         "Content-Type": "application/json"
     }
 
@@ -114,7 +114,7 @@ def process_request():
 
     if service_type == 'qnyun_ai':
         # 收集生成器内容时过滤 None 值
-        response_content = [content for content in call_qnyun_ai("http://swei02p5t.hd-bkt.clouddn.com/sample/sumiao.jpg") if content is not None]
+        response_content = [content for content in call_qnyun_ai("http://.hd-bkt.clouddn.com/sample/sumiao.jpg") if content is not None]
         full_response = ''.join(response_content)
         return jsonify({"response": full_response})
     elif service_type == 'qiniu':
