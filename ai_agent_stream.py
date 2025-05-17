@@ -1,7 +1,7 @@
 import requests
 import time
 from datetime import datetime
-QINIU_DOMAIN = 'http://swei02p5t.hd-bkt.clouddn.com' 
+QINIU_DOMAIN = 'http://.hd-bkt.clouddn.com' 
 
 class AIAgent:
     def __init__(self, server_url="http://localhost:5001"):
