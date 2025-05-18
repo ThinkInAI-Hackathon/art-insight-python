@@ -1,3 +1,5 @@
+from tkinter import image_names
+
 from flask import Flask, request, jsonify, Response
 from qiniu import Auth, BucketManager
 import json
@@ -113,10 +115,12 @@ def call_qnyun_ai(image_url):
 def process_request():
     data = request.json
     service_type = data.get('service_type')
+    image_name = data.get('payload').get('image_url')
+    print("image_name", image_name)
 
     if service_type == 'qnyun_ai':
         # 收集生成器内容时过滤 None 值
-        response_content = [content for content in call_qnyun_ai(QINIU_DOMAIN+"/sample/sumiao.jpg") if content is not None]
+        response_content = [content for content in call_qnyun_ai(image_name) if content is not None]
         full_response = ''.join(response_content)
         return jsonify({"response": full_response})
     elif service_type == 'qiniu':
