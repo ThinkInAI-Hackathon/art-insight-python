@@ -55,8 +55,16 @@ import requests
 
 import report_string as report_string
 
-def call_qnyun_ai(image_url):
+def call_qnyun_ai(image_url, image_type): #type:sm,sc,sx
     url = "https://api.qnaigc.com/v1/chat/completions"
+
+    if image_type == "sm":
+        prompt_text = report_string.report_sumiao
+    elif image_type == "sx":
+        prompt_text = report_string.report_suxie
+    else:
+        prompt_text = report_string.report_color
+
     payload = {
         "stream": True,
         "model": "doubao-1.5-vision-pro",        
@@ -66,7 +74,7 @@ def call_qnyun_ai(image_url):
                 "content": [
                 {
                     "type": "text",
-                    "text": report_string.report_color
+                    "text": prompt_text
                 },
                     {"type": "image_url", "image_url": {"url": image_url}}
                 ]
@@ -117,10 +125,16 @@ def process_request():
     service_type = data.get('service_type')
     image_name = data.get('payload').get('image_url')
     print("image_name", image_name)
+    if "素描" in image_name:
+        image_type = "sm"
+    elif "速写" in image_name:
+        image_type = "sx"
+    else:
+        image_type = "sc"
 
     if service_type == 'qnyun_ai':
         # 收集生成器内容时过滤 None 值
-        response_content = [content for content in call_qnyun_ai(image_name) if content is not None]
+        response_content = [content for content in call_qnyun_ai(image_name, image_type) if content is not None]
         full_response = ''.join(response_content)
         return jsonify({"response": full_response})
     elif service_type == 'qiniu':
