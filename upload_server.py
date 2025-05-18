@@ -4,11 +4,17 @@ import random
 from flask import Flask, request, jsonify, render_template
 from ai_agent_stream import AIAgent  # 导入 AI Agent 类
 
-# 七牛云配置（请替换为你的实际配置）
-QINIU_ACCESS_KEY = '_-5PY-'
-QINIU_SECRET_KEY = '-1ZtdHuL'
-QINIU_BUCKET = 'art-insight-poc1'
-QINIU_DOMAIN = 'http://.hd-bkt.clouddn.com'  # 如：http://xxx.bkt.clouddn.com
+# 从环境变量获取配置（若未设置则返回None）
+QINIU_ACCESS_KEY = os.getenv("QINIU_ACCESS_KEY")
+QINIU_SECRET_KEY = os.getenv("QINIU_SECRET_KEY")
+QINIU_BUCKET = os.getenv("QINIU_BUCKET")
+QINIU_DOMAIN = os.getenv("QINIU_DOMAIN")
+
+# 可选：添加配置检查（确保关键配置存在）
+required_vars = ["QINIU_ACCESS_KEY", "QINIU_SECRET_KEY", "QINIU_BUCKET", "QINIU_DOMAIN"]
+missing_vars = [var for var in required_vars if os.getenv(var) is None]
+if missing_vars:
+    raise EnvironmentError(f"缺少必要的环境变量: {', '.join(missing_vars)}")
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB限制

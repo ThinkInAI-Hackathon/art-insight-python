@@ -1,7 +1,19 @@
 import requests
 import time
 from datetime import datetime
-QINIU_DOMAIN = 'http://.hd-bkt.clouddn.com' 
+import os
+
+# 从环境变量获取配置（若未设置则返回None）
+QINIU_ACCESS_KEY = os.getenv("QINIU_ACCESS_KEY")
+QINIU_SECRET_KEY = os.getenv("QINIU_SECRET_KEY")
+QINIU_BUCKET = os.getenv("QINIU_BUCKET")
+QINIU_DOMAIN = os.getenv("QINIU_DOMAIN")
+
+# 可选：添加配置检查（确保关键配置存在）
+required_vars = ["QINIU_ACCESS_KEY", "QINIU_SECRET_KEY", "QINIU_BUCKET", "QINIU_DOMAIN"]
+missing_vars = [var for var in required_vars if os.getenv(var) is None]
+if missing_vars:
+    raise EnvironmentError(f"缺少必要的环境变量: {', '.join(missing_vars)}")
 
 class AIAgent:
     def __init__(self, server_url="http://localhost:5001"):
@@ -56,36 +68,13 @@ class AIAgent:
             decoded_chunk = chunk.encode('ascii').decode('unicode_escape')
             # print(f"接收到流式数据：{decoded_chunk}")  # 实时打印汉字
             results.append(decoded_chunk)  # 收集解码后的汉字数据
-        
+
+        print("lalalal", results)
         clean_str = results[1].replace("\"response\": \"","")
-        clean_str = md_to_html(remove_trailing_quote(clean_str))
+        clean_str = remove_trailing_quote(clean_str)
         return clean_str  # 返回处理后的字符串
         # return {"success": True, "stream_data": results}  # 返回汉字结果
-    
-import markdown
 
-def md_to_html(md_content: str) -> str:
-    """
-    将Markdown内容转换为HTML
-    
-    :param md_content: 输入的Markdown文本内容
-    :return: 转换后的HTML字符串
-    """
-    try:
-        # 启用扩展：表格、代码块、任务列表等常用功能
-        html_content = markdown.markdown(
-            md_content,
-            extensions=[
-                'markdown.extensions.tables',    # 支持表格
-                # 'markdown.extensions.tasklist',  # 支持任务列表
-                'markdown.extensions.fenced_code'  # 支持代码块
-            ]
-        )
-        return html_content
-    except Exception as e:
-        print(f"转换过程中发生错误: {str(e)}")
-        return ""
-    
 def remove_trailing_quote(s: str) -> str:
     """去除字符串末尾的双引号（如果存在）"""
     if len(s) > 0 and s.endswith(' "'):  # 检查字符串非空且以"结尾

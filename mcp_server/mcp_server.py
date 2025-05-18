@@ -1,10 +1,20 @@
 from flask import Flask, request, jsonify, Response
 from qiniu import Auth, BucketManager
-from aliyunsdkcore.client import AcsClient
-from aliyunsdkcore.acs_exception.exceptions import ClientException, ServerException
 import json
 import os
 from openai import OpenAI
+
+# 从环境变量获取配置（若未设置则返回None）
+QINIU_ACCESS_KEY = os.getenv("QINIU_ACCESS_KEY")
+QINIU_SECRET_KEY = os.getenv("QINIU_SECRET_KEY")
+QINIU_BUCKET = os.getenv("QINIU_BUCKET")
+QINIU_DOMAIN = os.getenv("QINIU_DOMAIN")
+
+# 可选：添加配置检查（确保关键配置存在）
+required_vars = ["QINIU_ACCESS_KEY", "QINIU_SECRET_KEY", "QINIU_BUCKET", "QINIU_DOMAIN"]
+missing_vars = [var for var in required_vars if os.getenv(var) is None]
+if missing_vars:
+    raise EnvironmentError(f"缺少必要的环境变量: {', '.join(missing_vars)}")
 
 app = Flask(__name__)
 # 配置参数
@@ -14,13 +24,6 @@ app.config.update({
     'LLM_BASE_URL': 'https://api.qnaigc.com/v1/chat/completions',
 })
 app.config['LLM_API_KEY'] = os.getenv('LLM_API_KEY', 'default-key')
-
-
-# 七牛云配置（请替换为你的实际配置）
-QINIU_ACCESS_KEY = '_-5PY-'
-QINIU_SECRET_KEY = '-1ZtdHuL'
-QINIU_BUCKET = 'art-insight-poc1'
-QINIU_DOMAIN = 'http://.hd-bkt.clouddn.com'  # 如：http://xxx.bkt.clouddn.com
 
 # 配置加载（建议使用环境变量或配置文件）
 CONFIG = {
@@ -33,7 +36,6 @@ CONFIG = {
 
 # 初始化客户端
 qiniu_auth = Auth(CONFIG['qiniu']['access_key'], CONFIG['qiniu']['secret_key'])
-
 
 llm_api_key = app.config['LLM_API_KEY']  # 替换为你的 API Key 配置
 url = app.config['LLM_BASE_URL']  # 替换为你的 API 基础 URL（如非默认）
@@ -70,7 +72,7 @@ def call_qnyun_ai(image_url):
         ]
     }
     headers = {
-        "Authorization": "Bearer sk-",
+        "Authorization": "Bearer " + llm_api_key,
         "Content-Type": "application/json"
     }
 
@@ -114,7 +116,7 @@ def process_request():
 
     if service_type == 'qnyun_ai':
         # 收集生成器内容时过滤 None 值
-        response_content = [content for content in call_qnyun_ai("http://.hd-bkt.clouddn.com/sample/sumiao.jpg") if content is not None]
+        response_content = [content for content in call_qnyun_ai(QINIU_DOMAIN+"/sample/sumiao.jpg") if content is not None]
         full_response = ''.join(response_content)
         return jsonify({"response": full_response})
     elif service_type == 'qiniu':
